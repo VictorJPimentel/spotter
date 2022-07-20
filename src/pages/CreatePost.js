@@ -27,9 +27,23 @@ function CreatePost({ isAuth }) {
     }
   }, []);
 
+  const [wSatus, setWStatus] = useState("");
+  const workCollectionRef = collection(db, "workers");
+
+
+  const workPost = async (id) => {
+    setWStatus(true)
+    await addDoc(workCollectionRef, {
+      id,
+      wSatus,
+      author: { name: auth.currentUser.displayName, id: auth.currentUser.uid },
+    });
+  };
+
   return (
     <div className="createPostPage">
-      <div className="cpContainer">
+      <button className="button is-primary"  onClick={() => { workPost(12);}}>Accept?</button>
+      <div className="container is-max-desktop cpContainer">
         <h1>Create A Post</h1>
         <div className="inputGp">
           <label> Title:</label>
@@ -43,7 +57,7 @@ function CreatePost({ isAuth }) {
         <div className="inputGp">
           <label> Company:</label>
           <input
-            placeholder="Company NAme..."
+            placeholder="Company Name..."
             onChange={(event) => {
               setCompany(event.target.value);
             }}
@@ -58,7 +72,7 @@ function CreatePost({ isAuth }) {
             }}
           />
         </div>
-        <button onClick={createPost}> Submit Post</button>
+        <button className="button is-primary" onClick={createPost}> Submit Post</button>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 // import logo from './logo.svg';
 import './App.css';
 // import Login from './components/login';
+import 'bulma/css/bulma.min.css';
 import React, { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import fire, { auth } from './firebase-config';
@@ -31,7 +32,7 @@ function App() {
 ) : (
   <>
     <Link to="/create"> Create Post </Link>
-    <button onClick={signUserOut}> Log Out</button>
+    <button className="button is-primary" onClick={signUserOut}> Log Out</button>
   </>
 )}
       </nav>

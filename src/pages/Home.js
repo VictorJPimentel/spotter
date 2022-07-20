@@ -1,72 +1,123 @@
-import React, { useEffect, useState } from 'react'
-import {getDocs, collection, deleteDoc, doc, addDoc, collection} from 'firebase/firestore'
+import React, { useEffect, useState, useCallback } from 'react'
+import {getDocs, collection, deleteDoc, doc, addDoc} from 'firebase/firestore'
 import { auth, db } from '../firebase-config';
 
 
 function Home({ isAuth }) {
 
-  const [wSatus, setWStatus] = useState("");
+
   const [postLists, setPostList] = useState([]);
-  const postCollectionRef = collection(db, "posts")
-  useEffect(() => {
-    const getPosts = async () => {
-      const data = await getDocs(postCollectionRef);
-      setPostList(data.docs.map((doc) => ({...doc.data(), id: doc.id})));
-    };
-    getPosts();
-  })
+  const postsCollectionRef = collection(db, "posts")
+  const [workerList, setWorkerList] = useState("");
 
-  const deletePost = async (id) => {
-    const postDoc = doc(db, "posts", id);
+  const deletePost = useCallback(async (e) => {
+    const postDoc = doc(db, "posts", e);
     await deleteDoc(postDoc);
-  };
-
-  const postsCollectionRef = collection(db, "workers");
-
-  const workPost = async (id) => {
-    await addDoc(postsCollectionRef, {
-      id,
-      wSatus,
-      author: { name: auth.currentUser.displayName, id: auth.currentUser.uid },
-    });
-  };
+  }, []);
 
 
+useEffect(() => {
+const getPosts = async () => {
+try {
+const data = await getDocs(postsCollectionRef);
+setPostList(data.docs.map((doc) => ({ ...doc.data(), e: doc.id })));
+const worker = await getDocs(workCollectionRef);
+setWorkerList(worker.docs.map((doc) => ({...doc.data()})) );
+
+} catch (error) {
+console.log(error);
+}
+};
+getPosts();
+}, [deletePost]);
+
+const [wSatus, setWStatus] = useState("");
+const workCollectionRef = collection(db, "workers");
+
+
+const workPost = async (e) => {
+  setWStatus(true)
+  await addDoc(workCollectionRef, {
+    e,
+    wSatus,
+    author: { name: auth.currentUser.displayName, photo: auth.currentUser.photoURL, id: auth.currentUser.uid },
+  });
+};
+
+  useEffect(() => {
+    const getWorker = async () => {
+      const worker = await getDocs(workCollectionRef);
+      setWorkerList(worker.docs.map((doc) => ({...doc.data(), id: doc.id})) );
+    };
+    getWorker();
+  }, [])
 
 
   return (
-    <div className="homePage">
+    <div className="hero-body">
       {postLists.map((post) => {
         return (
-          <div className="post">
-            <div className="postHeader">
-              <div className="title">
-                <h1> {post.title}</h1>
-              </div>
-              <div className="deletePost">
-                {isAuth && post.author.id === auth.currentUser.uid && (
-                  <button
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-5-tablet">
+          <div className="box">
+          <div className="columns">
+  <div className="column title is-three-fifths">{post.title}</div>
+  <div className="column">                {isAuth && post.author.id === auth.currentUser.uid && (
+                  <button className="button is-danger"
                     onClick={() => {
-                      deletePost(post.id);
+                      deletePost(post.e);
                     }}
                   >
-                    {" "}
-                    &#128465;
+                    Delete
                   </button>
-                )}
-              </div>
-            </div>
-            <div className="postTextContainer"> {post.postText} </div>
-            <div className="bottom-part">
-            <h3>@{post.author.name}</h3><button                     onClick={() => { workPost(post.id);                    }}>Accept?</button>
-            </div>
-            <div className="post-working">
-            <h5>@Pedro is working on it</h5>
+                )}</div>
+                  <div className="column">  
+                  <button className="button is-sucess"  onClick={() => { workPost(post.e);}}>Accept</button>
+                  </div>
+                
+                </div>
+  <div className="columns">    
+  <div className="column"> 
+              <h3>@{post.author.name}</h3>
+              
+              
+              </div> </div>
+              {post.postText}
             <hr></hr>
-            <h5>@Pedro is working on it</h5>
-            <hr></hr>
-            <h5>@Pedro is working on it</h5>
+
+
+      {workerList.map((worker) => {return ( <>{worker.e === post.e && (<>
+                  
+                  
+        <article className="media">
+  <figure className="media-left">
+ 
+      <img className="is-rounded image is-48x48" src={worker.author.photo} />
+   
+  </figure>
+  <div className="media-content">
+    <div className="content">
+      <p>
+                  
+                  <h5>@{worker.author.name} is working on it</h5><hr></hr>
+                  
+                  
+                  </p>
+    </div>
+    </div>
+</article>
+                  
+                  
+                  
+                  </>)}</>)})}
+
+
             </div>
+            </div> 
+            </div>
+          </div>
           </div>
         );
       })}
