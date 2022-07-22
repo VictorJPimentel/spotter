@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import {getDocs, collection, deleteDoc, doc, addDoc} from 'firebase/firestore'
+import {getDocs, collection, deleteDoc, doc, addDoc, updateDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase-config';
 
 
@@ -53,6 +53,13 @@ const workPost = async (e) => {
   }, [])
 
 
+  const submitWork = async (e) => {
+    await updateDoc(workCollectionRef, {
+      wSatus: false
+    });
+  };
+
+
   return (
     <div className="hero-body">
       {postLists.map((post) => {
@@ -60,8 +67,18 @@ const workPost = async (e) => {
   <div class="hero-body">
     <div class="container">
       <div class="columns is-centered">
-        <div class="column is-5-tablet">
+        <div class="column is-full">
           <div className="box">
+
+
+
+
+
+          <div class="columns is-centered">
+    <img className="image is-128x128" src={post.author.photo} />
+</div>
+<hr class="login-hr"></hr>
+
           <div className="columns">
   <div className="column title is-three-fifths">{post.title}</div>
   <div className="column">                {isAuth && post.author.id === auth.currentUser.uid && (
@@ -74,7 +91,7 @@ const workPost = async (e) => {
                   </button>
                 )}</div>
                   <div className="column">  
-                  <button className="button is-sucess"  onClick={() => { workPost(post.e);}}>Accept</button>
+                  <button className="button is-sucess"  onClick={() => {workPost(post.e);}}>Accept</button>
                   </div>
                 
                 </div>
@@ -99,14 +116,37 @@ const workPost = async (e) => {
   </figure>
   <div className="media-content">
     <div className="content">
-      <p>
+ 
                   
                   <h5>@{worker.author.name} is working on it</h5><hr></hr>
                   
                   
-                  </p>
+              
     </div>
     </div>
+
+
+
+
+
+    <div className="media-right">                {isAuth && worker.author.id === auth.currentUser.uid && (
+
+
+<div class="file">
+  <label class="file-label">
+    <input onClick={() => {workPost(post.e);}} class="file-input" type="file" name="submitVideo"/>
+    <span class="file-cta">
+      <span class="file-label">
+        Submit
+      </span>
+    </span>
+  </label>
+</div>
+
+                )}</div>
+
+
+
 </article>
                   
                   
